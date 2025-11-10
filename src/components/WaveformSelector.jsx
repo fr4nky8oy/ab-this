@@ -35,7 +35,7 @@ function WaveformSelector({ audioFile, label, color, onRegionChange }) {
     const wavesurfer = WaveSurfer.create({
       container: containerRef.current,
       waveColor: color === 'blue' ? '#3b82f6' : '#10b981',
-      progressColor: color === 'blue' ? '#60a5fa' : '#34d399',
+      progressColor: color === 'blue' ? '#3b82f6' : '#10b981', // Keep same as waveColor
       cursorColor: '#fff',
       barWidth: 2,
       barGap: 1,
@@ -63,7 +63,7 @@ function WaveformSelector({ audioFile, label, color, onRegionChange }) {
       const region = wsRegions.addRegion({
         start: 0,
         end: initialEnd,
-        color: color === 'blue' ? 'rgba(59, 130, 246, 0.4)' : 'rgba(16, 185, 129, 0.4)',
+        color: 'rgba(255, 255, 255, 0.3)', // White overlay for selected region
         drag: true,
         resize: true,
       })
@@ -83,36 +83,49 @@ function WaveformSelector({ audioFile, label, color, onRegionChange }) {
       }
     })
 
-    // Listen for region updates - enforce 40s max during drag/resize
-    wsRegions.on('region-update-end', (region) => {
+    // Listen for region updates during drag/resize - real-time enforcement
+    wsRegions.on('region-updated', (region) => {
       const start = region.start
       let end = region.end
       let adjustedStart = start
       let adjustedEnd = end
+      let needsAdjustment = false
 
       // Enforce 40-second maximum
       if (end - start > 40) {
         adjustedEnd = start + 40
-        region.setOptions({ end: adjustedEnd })
+        needsAdjustment = true
       }
 
       // Ensure region doesn't go beyond audio duration
-      if (adjustedEnd > duration) {
-        adjustedEnd = duration
+      if (adjustedEnd > audioDuration) {
+        adjustedEnd = audioDuration
         adjustedStart = Math.max(0, adjustedEnd - 40)
+        needsAdjustment = true
+      }
+
+      // Apply adjustments if needed
+      if (needsAdjustment) {
         region.setOptions({ start: adjustedStart, end: adjustedEnd })
       }
 
+      // Always update state for display
       setRegionStart(adjustedStart)
       setRegionEnd(adjustedEnd)
       activeRegionRef.current = region
+    })
+
+    // Listen for region updates when drag/resize ends - notify parent
+    wsRegions.on('region-update-end', (region) => {
+      const start = region.start
+      const end = region.end
 
       // Notify parent component
       if (onRegionChange) {
         onRegionChange({
-          start: adjustedStart,
-          end: adjustedEnd,
-          duration: adjustedEnd - adjustedStart,
+          start: start,
+          end: end,
+          duration: end - start,
         })
       }
     })
