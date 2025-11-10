@@ -23,6 +23,7 @@ function WaveformSelector({ audioFile, label, color, onRegionChange }) {
     if (!containerRef.current || !audioFile) return
 
     let dragDebounceTimer = null
+    let audioDuration = 0  // Move to outer scope so handleRegionEnd can access it
 
     // Inject CSS for white region handles
     const style = document.createElement('style')
@@ -62,7 +63,7 @@ function WaveformSelector({ audioFile, label, color, onRegionChange }) {
 
     // When audio is ready
     wavesurfer.on('ready', () => {
-      const audioDuration = wavesurfer.getDuration()
+      audioDuration = wavesurfer.getDuration()  // Set the outer scope variable
       setDuration(audioDuration)
       console.log(`WaveformSelector (${label}): Audio ready, duration:`, audioDuration)
 
