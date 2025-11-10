@@ -83,9 +83,19 @@ function WaveformSelector({ audioFile, label, color, onRegionChange }) {
       }
     })
 
-    // Listen for region updates during drag/resize - real-time enforcement
+    // Listen for region updates during drag/resize - update display only
     wsRegions.on('region-updated', (region) => {
       const start = region.start
+      const end = region.end
+
+      // Update state for display (don't enforce during drag to avoid sticking)
+      setRegionStart(start)
+      setRegionEnd(end)
+    })
+
+    // Listen for region updates when drag/resize ends - enforce limits and notify parent
+    wsRegions.on('region-update-end', (region) => {
+      let start = region.start
       let end = region.end
       let adjustedStart = start
       let adjustedEnd = end
@@ -109,23 +119,17 @@ function WaveformSelector({ audioFile, label, color, onRegionChange }) {
         region.setOptions({ start: adjustedStart, end: adjustedEnd })
       }
 
-      // Always update state for display
+      // Update state for display
       setRegionStart(adjustedStart)
       setRegionEnd(adjustedEnd)
       activeRegionRef.current = region
-    })
-
-    // Listen for region updates when drag/resize ends - notify parent
-    wsRegions.on('region-update-end', (region) => {
-      const start = region.start
-      const end = region.end
 
       // Notify parent component
       if (onRegionChange) {
         onRegionChange({
-          start: start,
-          end: end,
-          duration: end - start,
+          start: adjustedStart,
+          end: adjustedEnd,
+          duration: adjustedEnd - adjustedStart,
         })
       }
     })
