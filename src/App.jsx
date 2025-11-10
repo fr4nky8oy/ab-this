@@ -202,6 +202,8 @@ function App() {
               referenceFile={referenceFile}
               yourMixName={results.your_mix.filename}
               referenceName={results.reference.filename}
+              yourMixRegion={yourMixRegion}
+              referenceRegion={referenceRegion}
             />
 
             <SpectrumChart

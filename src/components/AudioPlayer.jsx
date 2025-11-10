@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import './AudioPlayer.css'
 
-function AudioPlayer({ yourMixFile, referenceFile, yourMixName, referenceName }) {
+function AudioPlayer({ yourMixFile, referenceFile, yourMixName, referenceName, yourMixRegion, referenceRegion }) {
   const [playing, setPlaying] = useState(null) // 'your' or 'reference' or null
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
@@ -11,28 +11,80 @@ function AudioPlayer({ yourMixFile, referenceFile, yourMixName, referenceName })
   const audioContextRef = useRef(null)
 
   useEffect(() => {
-    // Create audio elements
+    if (!yourMixFile || !referenceFile) return
+
+    // Calculate region durations
+    const yourRegionDuration = yourMixRegion ? (yourMixRegion.end - yourMixRegion.start) : 0
+    const refRegionDuration = referenceRegion ? (referenceRegion.end - referenceRegion.start) : 0
+    const regionDuration = Math.max(yourRegionDuration, refRegionDuration)
+
+    // Create Your Mix audio element
     if (yourMixFile) {
       yourAudioRef.current = new Audio(URL.createObjectURL(yourMixFile))
+
       yourAudioRef.current.addEventListener('loadedmetadata', () => {
-        setDuration(yourAudioRef.current.duration)
+        if (yourMixRegion) {
+          // Set audio to start at region start
+          yourAudioRef.current.currentTime = yourMixRegion.start
+          setDuration(yourMixRegion.duration || regionDuration)
+          setCurrentTime(0) // Display starts at 0:00 (relative to region start)
+        } else {
+          setDuration(yourAudioRef.current.duration)
+        }
       })
+
       yourAudioRef.current.addEventListener('timeupdate', () => {
-        setCurrentTime(yourAudioRef.current.currentTime)
+        if (yourMixRegion) {
+          // Calculate time relative to region start
+          const relativeTime = yourAudioRef.current.currentTime - yourMixRegion.start
+          setCurrentTime(Math.max(0, relativeTime))
+
+          // Stop at region end
+          if (yourAudioRef.current.currentTime >= yourMixRegion.end) {
+            yourAudioRef.current.pause()
+            setPlaying(null)
+          }
+        } else {
+          setCurrentTime(yourAudioRef.current.currentTime)
+        }
       })
+
       yourAudioRef.current.addEventListener('ended', () => {
         setPlaying(null)
       })
     }
 
+    // Create Reference audio element
     if (referenceFile) {
       refAudioRef.current = new Audio(URL.createObjectURL(referenceFile))
+
       refAudioRef.current.addEventListener('loadedmetadata', () => {
-        if (!duration) setDuration(refAudioRef.current.duration)
+        if (referenceRegion) {
+          // Set audio to start at region start
+          refAudioRef.current.currentTime = referenceRegion.start
+          if (!duration) setDuration(referenceRegion.duration || regionDuration)
+          setCurrentTime(0) // Display starts at 0:00 (relative to region start)
+        } else {
+          if (!duration) setDuration(refAudioRef.current.duration)
+        }
       })
+
       refAudioRef.current.addEventListener('timeupdate', () => {
-        setCurrentTime(refAudioRef.current.currentTime)
+        if (referenceRegion) {
+          // Calculate time relative to region start
+          const relativeTime = refAudioRef.current.currentTime - referenceRegion.start
+          setCurrentTime(Math.max(0, relativeTime))
+
+          // Stop at region end
+          if (refAudioRef.current.currentTime >= referenceRegion.end) {
+            refAudioRef.current.pause()
+            setPlaying(null)
+          }
+        } else {
+          setCurrentTime(refAudioRef.current.currentTime)
+        }
       })
+
       refAudioRef.current.addEventListener('ended', () => {
         setPlaying(null)
       })
@@ -48,7 +100,7 @@ function AudioPlayer({ yourMixFile, referenceFile, yourMixName, referenceName })
         URL.revokeObjectURL(refAudioRef.current.src)
       }
     }
-  }, [yourMixFile, referenceFile])
+  }, [yourMixFile, referenceFile, yourMixRegion, referenceRegion])
 
   const playYourMix = () => {
     if (playing === 'your') {
@@ -56,7 +108,14 @@ function AudioPlayer({ yourMixFile, referenceFile, yourMixName, referenceName })
       setPlaying(null)
     } else {
       if (refAudioRef.current) refAudioRef.current.pause()
-      yourAudioRef.current.currentTime = currentTime
+
+      // If region exists, convert relative time to absolute time
+      if (yourMixRegion) {
+        yourAudioRef.current.currentTime = yourMixRegion.start + currentTime
+      } else {
+        yourAudioRef.current.currentTime = currentTime
+      }
+
       yourAudioRef.current.play()
       setPlaying('your')
     }
@@ -68,7 +127,14 @@ function AudioPlayer({ yourMixFile, referenceFile, yourMixName, referenceName })
       setPlaying(null)
     } else {
       if (yourAudioRef.current) yourAudioRef.current.pause()
-      refAudioRef.current.currentTime = currentTime
+
+      // If region exists, convert relative time to absolute time
+      if (referenceRegion) {
+        refAudioRef.current.currentTime = referenceRegion.start + currentTime
+      } else {
+        refAudioRef.current.currentTime = currentTime
+      }
+
       refAudioRef.current.play()
       setPlaying('reference')
     }
@@ -77,12 +143,26 @@ function AudioPlayer({ yourMixFile, referenceFile, yourMixName, referenceName })
   const togglePlayback = () => {
     if (playing === 'your') {
       yourAudioRef.current.pause()
-      refAudioRef.current.currentTime = currentTime
+
+      // Convert relative time to absolute time for reference
+      if (referenceRegion) {
+        refAudioRef.current.currentTime = referenceRegion.start + currentTime
+      } else {
+        refAudioRef.current.currentTime = currentTime
+      }
+
       refAudioRef.current.play()
       setPlaying('reference')
     } else if (playing === 'reference') {
       refAudioRef.current.pause()
-      yourAudioRef.current.currentTime = currentTime
+
+      // Convert relative time to absolute time for your mix
+      if (yourMixRegion) {
+        yourAudioRef.current.currentTime = yourMixRegion.start + currentTime
+      } else {
+        yourAudioRef.current.currentTime = currentTime
+      }
+
       yourAudioRef.current.play()
       setPlaying('your')
     }
@@ -95,8 +175,23 @@ function AudioPlayer({ yourMixFile, referenceFile, yourMixName, referenceName })
     const newTime = percentage * duration
 
     setCurrentTime(newTime)
-    if (yourAudioRef.current) yourAudioRef.current.currentTime = newTime
-    if (refAudioRef.current) refAudioRef.current.currentTime = newTime
+
+    // Convert relative time to absolute time for regions
+    if (yourAudioRef.current) {
+      if (yourMixRegion) {
+        yourAudioRef.current.currentTime = yourMixRegion.start + newTime
+      } else {
+        yourAudioRef.current.currentTime = newTime
+      }
+    }
+
+    if (refAudioRef.current) {
+      if (referenceRegion) {
+        refAudioRef.current.currentTime = referenceRegion.start + newTime
+      } else {
+        refAudioRef.current.currentTime = newTime
+      }
+    }
   }
 
   const formatTime = (seconds) => {
