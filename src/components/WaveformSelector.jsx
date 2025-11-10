@@ -7,12 +7,29 @@ function WaveformSelector({ audioFile, label, color, onRegionChange }) {
   const containerRef = useRef(null)
   const wavesurferRef = useRef(null)
   const regionsPluginRef = useRef(null)
+  const activeRegionRef = useRef(null)
   const [duration, setDuration] = useState(0)
   const [regionStart, setRegionStart] = useState(0)
   const [regionEnd, setRegionEnd] = useState(40)
+  const [isPlaying, setIsPlaying] = useState(false)
 
   useEffect(() => {
     if (!containerRef.current || !audioFile) return
+
+    // Inject CSS for white region handles
+    const style = document.createElement('style')
+    style.textContent = `
+      .wavesurfer-region::before,
+      .wavesurfer-region::after {
+        background: white !important;
+        width: 3px !important;
+      }
+      .wavesurfer-handle {
+        background: white !important;
+        width: 3px !important;
+      }
+    `
+    document.head.appendChild(style)
 
     // Create wavesurfer instance
     const wavesurfer = WaveSurfer.create({
@@ -43,13 +60,15 @@ function WaveformSelector({ audioFile, label, color, onRegionChange }) {
       // Create initial region (first 40 seconds or full duration if shorter)
       const initialEnd = Math.min(40, audioDuration)
 
-      wsRegions.addRegion({
+      const region = wsRegions.addRegion({
         start: 0,
         end: initialEnd,
-        color: color === 'blue' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(16, 185, 129, 0.2)',
+        color: color === 'blue' ? 'rgba(59, 130, 246, 0.4)' : 'rgba(16, 185, 129, 0.4)',
         drag: true,
         resize: true,
       })
+
+      activeRegionRef.current = region
 
       setRegionStart(0)
       setRegionEnd(initialEnd)
@@ -64,10 +83,11 @@ function WaveformSelector({ audioFile, label, color, onRegionChange }) {
       }
     })
 
-    // Listen for region updates
-    wsRegions.on('region-updated', (region) => {
+    // Listen for region updates - enforce 40s max during drag/resize
+    wsRegions.on('region-update-end', (region) => {
       const start = region.start
-      const end = region.end
+      let end = region.end
+      let adjustedStart = start
       let adjustedEnd = end
 
       // Enforce 40-second maximum
@@ -76,17 +96,38 @@ function WaveformSelector({ audioFile, label, color, onRegionChange }) {
         region.setOptions({ end: adjustedEnd })
       }
 
-      setRegionStart(start)
+      // Ensure region doesn't go beyond audio duration
+      if (adjustedEnd > duration) {
+        adjustedEnd = duration
+        adjustedStart = Math.max(0, adjustedEnd - 40)
+        region.setOptions({ start: adjustedStart, end: adjustedEnd })
+      }
+
+      setRegionStart(adjustedStart)
       setRegionEnd(adjustedEnd)
+      activeRegionRef.current = region
 
       // Notify parent component
       if (onRegionChange) {
         onRegionChange({
-          start: start,
+          start: adjustedStart,
           end: adjustedEnd,
-          duration: adjustedEnd - start,
+          duration: adjustedEnd - adjustedStart,
         })
       }
+    })
+
+    // Stop playback when audio finishes
+    wavesurfer.on('finish', () => {
+      setIsPlaying(false)
+    })
+
+    wavesurfer.on('pause', () => {
+      setIsPlaying(false)
+    })
+
+    wavesurfer.on('play', () => {
+      setIsPlaying(true)
     })
 
     wavesurferRef.current = wavesurfer
@@ -95,6 +136,9 @@ function WaveformSelector({ audioFile, label, color, onRegionChange }) {
     return () => {
       if (wavesurfer) {
         wavesurfer.destroy()
+      }
+      if (style && style.parentNode) {
+        style.parentNode.removeChild(style)
       }
     }
   }, [audioFile, color, onRegionChange])
@@ -105,6 +149,17 @@ function WaveformSelector({ audioFile, label, color, onRegionChange }) {
     return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
+  const handlePlayRegion = () => {
+    if (!wavesurferRef.current || !activeRegionRef.current) return
+
+    if (isPlaying) {
+      wavesurferRef.current.pause()
+    } else {
+      // Play only the selected region
+      activeRegionRef.current.play()
+    }
+  }
+
   return (
     <div className={`waveform-selector waveform-${color}`}>
       <div className="waveform-header">
@@ -113,6 +168,15 @@ function WaveformSelector({ audioFile, label, color, onRegionChange }) {
       </div>
 
       <div ref={containerRef} className="waveform-container" />
+
+      <div className="waveform-controls">
+        <button
+          className={`play-region-btn ${isPlaying ? 'playing' : ''}`}
+          onClick={handlePlayRegion}
+        >
+          {isPlaying ? '⏸ Pause' : '▶ Play Selected Region'}
+        </button>
+      </div>
 
       <div className="waveform-info">
         <div className="region-info">
