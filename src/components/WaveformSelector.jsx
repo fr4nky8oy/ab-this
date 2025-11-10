@@ -8,10 +8,16 @@ function WaveformSelector({ audioFile, label, color, onRegionChange }) {
   const wavesurferRef = useRef(null)
   const regionsPluginRef = useRef(null)
   const activeRegionRef = useRef(null)
+  const onRegionChangeRef = useRef(onRegionChange)
   const [duration, setDuration] = useState(0)
   const [regionStart, setRegionStart] = useState(0)
   const [regionEnd, setRegionEnd] = useState(40)
   const [isPlaying, setIsPlaying] = useState(false)
+
+  // Keep the callback ref up to date
+  useEffect(() => {
+    onRegionChangeRef.current = onRegionChange
+  }, [onRegionChange])
 
   useEffect(() => {
     if (!containerRef.current || !audioFile) return
@@ -74,8 +80,8 @@ function WaveformSelector({ audioFile, label, color, onRegionChange }) {
       setRegionEnd(initialEnd)
 
       // Notify parent component
-      if (onRegionChange) {
-        onRegionChange({
+      if (onRegionChangeRef.current) {
+        onRegionChangeRef.current({
           start: 0,
           end: initialEnd,
           duration: initialEnd,
@@ -125,8 +131,9 @@ function WaveformSelector({ audioFile, label, color, onRegionChange }) {
       activeRegionRef.current = region
 
       // Notify parent component
-      if (onRegionChange) {
-        onRegionChange({
+      if (onRegionChangeRef.current) {
+        console.log('WaveformSelector: Notifying parent of region change:', adjustedStart, '->', adjustedEnd)
+        onRegionChangeRef.current({
           start: adjustedStart,
           end: adjustedEnd,
           duration: adjustedEnd - adjustedStart,
@@ -158,7 +165,7 @@ function WaveformSelector({ audioFile, label, color, onRegionChange }) {
         style.parentNode.removeChild(style)
       }
     }
-  }, [audioFile, color, onRegionChange])
+  }, [audioFile, color]) // Removed onRegionChange to prevent recreation loop
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60)

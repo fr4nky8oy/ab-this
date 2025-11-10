@@ -13,6 +13,8 @@ function AudioPlayer({ yourMixFile, referenceFile, yourMixName, referenceName, y
   useEffect(() => {
     if (!yourMixFile || !referenceFile) return
 
+    console.log('AudioPlayer setup - Regions:', { yourMixRegion, referenceRegion })
+
     // Calculate region durations
     const yourRegionDuration = yourMixRegion ? (yourMixRegion.end - yourMixRegion.start) : 0
     const refRegionDuration = referenceRegion ? (referenceRegion.end - referenceRegion.start) : 0
@@ -23,12 +25,16 @@ function AudioPlayer({ yourMixFile, referenceFile, yourMixName, referenceName, y
       yourAudioRef.current = new Audio(URL.createObjectURL(yourMixFile))
 
       yourAudioRef.current.addEventListener('loadedmetadata', () => {
+        console.log('Your Mix metadata loaded')
         if (yourMixRegion) {
+          console.log('Setting Your Mix to start at:', yourMixRegion.start, 'seconds')
           // Set audio to start at region start
           yourAudioRef.current.currentTime = yourMixRegion.start
           setDuration(yourMixRegion.duration || regionDuration)
           setCurrentTime(0) // Display starts at 0:00 (relative to region start)
+          console.log('Your Mix currentTime set to:', yourAudioRef.current.currentTime)
         } else {
+          console.log('No region for Your Mix - using full file')
           setDuration(yourAudioRef.current.duration)
         }
       })
@@ -59,12 +65,16 @@ function AudioPlayer({ yourMixFile, referenceFile, yourMixName, referenceName, y
       refAudioRef.current = new Audio(URL.createObjectURL(referenceFile))
 
       refAudioRef.current.addEventListener('loadedmetadata', () => {
+        console.log('Reference metadata loaded')
         if (referenceRegion) {
+          console.log('Setting Reference to start at:', referenceRegion.start, 'seconds')
           // Set audio to start at region start
           refAudioRef.current.currentTime = referenceRegion.start
           if (!duration) setDuration(referenceRegion.duration || regionDuration)
           setCurrentTime(0) // Display starts at 0:00 (relative to region start)
+          console.log('Reference currentTime set to:', refAudioRef.current.currentTime)
         } else {
+          console.log('No region for Reference - using full file')
           if (!duration) setDuration(refAudioRef.current.duration)
         }
       })
@@ -111,7 +121,9 @@ function AudioPlayer({ yourMixFile, referenceFile, yourMixName, referenceName, y
 
       // If region exists, convert relative time to absolute time
       if (yourMixRegion) {
-        yourAudioRef.current.currentTime = yourMixRegion.start + currentTime
+        const absoluteTime = yourMixRegion.start + currentTime
+        console.log('Playing Your Mix from:', absoluteTime, '(region start:', yourMixRegion.start, '+ current:', currentTime, ')')
+        yourAudioRef.current.currentTime = absoluteTime
       } else {
         yourAudioRef.current.currentTime = currentTime
       }
@@ -200,9 +212,38 @@ function AudioPlayer({ yourMixFile, referenceFile, yourMixName, referenceName, y
     return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
+  const formatTimeSeconds = (seconds) => {
+    const mins = Math.floor(seconds / 60)
+    const secs = Math.floor(seconds % 60)
+    return `${mins}:${secs.toString().padStart(2, '0')}`
+  }
+
   return (
     <div className="audio-player">
       <h3>A/B Playback</h3>
+
+      {(yourMixRegion || referenceRegion) && (
+        <div className="region-info-display" style={{
+          background: 'rgba(59, 130, 246, 0.1)',
+          border: '1px solid rgba(59, 130, 246, 0.3)',
+          borderRadius: '8px',
+          padding: '12px',
+          marginBottom: '16px',
+          fontSize: '14px'
+        }}>
+          <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>Analyzed Regions:</div>
+          {yourMixRegion && (
+            <div style={{ marginBottom: '4px' }}>
+              <span style={{ color: '#3b82f6' }}>▶ Your Mix:</span> {formatTimeSeconds(yourMixRegion.start)} - {formatTimeSeconds(yourMixRegion.end)} ({yourMixRegion.duration?.toFixed(1)}s)
+            </div>
+          )}
+          {referenceRegion && (
+            <div>
+              <span style={{ color: '#10b981' }}>▶ Reference:</span> {formatTimeSeconds(referenceRegion.start)} - {formatTimeSeconds(referenceRegion.end)} ({referenceRegion.duration?.toFixed(1)}s)
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="player-controls">
         <button
