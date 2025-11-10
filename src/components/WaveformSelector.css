@@ -1,0 +1,131 @@
+.waveform-selector {
+  background: #1a1a1a;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.waveform-blue {
+  border: 2px solid #3b82f6;
+}
+
+.waveform-green {
+  border: 2px solid #10b981;
+}
+
+.waveform-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.waveform-header h4 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.waveform-blue h4 {
+  color: #3b82f6;
+}
+
+.waveform-green h4 {
+  color: #10b981;
+}
+
+.file-name {
+  font-size: 14px;
+  color: #888;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.waveform-container {
+  width: 100%;
+  margin: 16px 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #111;
+  cursor: pointer;
+}
+
+.waveform-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #333;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.region-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.region-label {
+  font-size: 14px;
+  color: #888;
+}
+
+.region-time {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.region-duration {
+  font-size: 14px;
+  color: #10b981;
+  font-weight: 500;
+}
+
+.region-duration.warning {
+  color: #ef4444;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.total-duration {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .waveform-selector {
+    padding: 16px;
+  }
+
+  .waveform-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .file-name {
+    max-width: 100%;
+  }
+
+  .waveform-info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

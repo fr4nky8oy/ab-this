@@ -58,6 +58,33 @@ body {
   margin: 0 auto;
 }
 
+/* Waveform Section */
+.waveform-section {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.waveform-instructions {
+  text-align: center;
+  margin-bottom: 32px;
+  padding: 24px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(16, 185, 129, 0.1));
+  border-radius: 12px;
+  border: 1px solid #333;
+}
+
+.waveform-instructions h3 {
+  margin: 0 0 12px 0;
+  font-size: 24px;
+  color: #fff;
+}
+
+.waveform-instructions p {
+  margin: 0;
+  color: #888;
+  font-size: 16px;
+}
+
 .upload-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
