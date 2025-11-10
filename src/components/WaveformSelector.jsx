@@ -22,6 +22,8 @@ function WaveformSelector({ audioFile, label, color, onRegionChange }) {
   useEffect(() => {
     if (!containerRef.current || !audioFile) return
 
+    let dragDebounceTimer = null
+
     // Inject CSS for white region handles
     const style = document.createElement('style')
     style.textContent = `
@@ -62,6 +64,7 @@ function WaveformSelector({ audioFile, label, color, onRegionChange }) {
     wavesurfer.on('ready', () => {
       const audioDuration = wavesurfer.getDuration()
       setDuration(audioDuration)
+      console.log(`WaveformSelector (${label}): Audio ready, duration:`, audioDuration)
 
       // Create initial region (first 40 seconds or full duration if shorter)
       const initialEnd = Math.min(40, audioDuration)
@@ -79,6 +82,8 @@ function WaveformSelector({ audioFile, label, color, onRegionChange }) {
       setRegionStart(0)
       setRegionEnd(initialEnd)
 
+      console.log(`WaveformSelector (${label}): Initial region created 0 -> ${initialEnd}`)
+
       // Notify parent component
       if (onRegionChangeRef.current) {
         onRegionChangeRef.current({
@@ -89,18 +94,49 @@ function WaveformSelector({ audioFile, label, color, onRegionChange }) {
       }
     })
 
-    // Listen for region updates during drag/resize - update display only
+    // Listen for region updates during drag/resize - update display AND debounce parent notification
     wsRegions.on('region-updated', (region) => {
+      console.log(`WaveformSelector (${label}): region-updated event - ${region.start.toFixed(1)} -> ${region.end.toFixed(1)}`)
       const start = region.start
       const end = region.end
 
-      // Update state for display (don't enforce during drag to avoid sticking)
+      // Update state for display immediately
       setRegionStart(start)
       setRegionEnd(end)
+
+      // Clear previous timer
+      if (dragDebounceTimer) {
+        clearTimeout(dragDebounceTimer)
+      }
+
+      // Wait 500ms after last drag movement, then notify parent
+      dragDebounceTimer = setTimeout(() => {
+        console.log(`WaveformSelector (${label}): Drag finished (debounced), notifying parent`)
+        handleRegionEnd(region)
+      }, 500)
+    })
+
+    // Listen for ALL region events to debug
+    wsRegions.on('region-clicked', (region) => {
+      console.log(`WaveformSelector (${label}): region-clicked`)
+    })
+
+    wsRegions.on('region-in', (region) => {
+      console.log(`WaveformSelector (${label}): region-in`)
+    })
+
+    wsRegions.on('region-out', (region) => {
+      console.log(`WaveformSelector (${label}): region-out - ${region.start.toFixed(1)} -> ${region.end.toFixed(1)}`)
+      handleRegionEnd(region)
     })
 
     // Listen for region updates when drag/resize ends - enforce limits and notify parent
     wsRegions.on('region-update-end', (region) => {
+      console.log(`WaveformSelector (${label}): region-update-end event - ${region.start.toFixed(1)} -> ${region.end.toFixed(1)}`)
+      handleRegionEnd(region)
+    })
+
+    const handleRegionEnd = (region) => {
       let start = region.start
       let end = region.end
       let adjustedStart = start
@@ -132,14 +168,16 @@ function WaveformSelector({ audioFile, label, color, onRegionChange }) {
 
       // Notify parent component
       if (onRegionChangeRef.current) {
-        console.log('WaveformSelector: Notifying parent of region change:', adjustedStart, '->', adjustedEnd)
+        console.log(`WaveformSelector (${label}): Notifying parent of region change: ${adjustedStart.toFixed(1)} -> ${adjustedEnd.toFixed(1)}`)
         onRegionChangeRef.current({
           start: adjustedStart,
           end: adjustedEnd,
           duration: adjustedEnd - adjustedStart,
         })
+      } else {
+        console.log(`WaveformSelector (${label}): WARNING - onRegionChangeRef.current is null!`)
       }
-    })
+    }
 
     // Stop playback when audio finishes
     wavesurfer.on('finish', () => {
@@ -158,6 +196,11 @@ function WaveformSelector({ audioFile, label, color, onRegionChange }) {
 
     // Cleanup
     return () => {
+      // Clear debounce timer
+      if (dragDebounceTimer) {
+        clearTimeout(dragDebounceTimer)
+      }
+
       if (wavesurfer) {
         wavesurfer.destroy()
       }

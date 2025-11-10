@@ -33,6 +33,10 @@ function App() {
       return
     }
 
+    console.log('=== ANALYZE BUTTON CLICKED ===')
+    console.log('Your Mix Region:', yourMixRegion)
+    console.log('Reference Region:', referenceRegion)
+
     setLoading(true)
     setError(null)
     setResults(null)
@@ -43,12 +47,18 @@ function App() {
 
     // Add region data if available
     if (yourMixRegion) {
+      console.log('Sending Your Mix region to backend:', yourMixRegion.start, 'to', yourMixRegion.end)
       formData.append('your_mix_start', yourMixRegion.start.toString())
       formData.append('your_mix_end', yourMixRegion.end.toString())
+    } else {
+      console.log('WARNING: No Your Mix region set!')
     }
     if (referenceRegion) {
+      console.log('Sending Reference region to backend:', referenceRegion.start, 'to', referenceRegion.end)
       formData.append('reference_start', referenceRegion.start.toString())
       formData.append('reference_end', referenceRegion.end.toString())
+    } else {
+      console.log('WARNING: No Reference region set!')
     }
 
     try {
