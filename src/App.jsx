@@ -100,6 +100,15 @@ function App() {
     setError(null)
   }
 
+  const handleSelectDifferentRegions = () => {
+    // Keep the uploaded files but reset regions and results to go back to waveform selection
+    setShowWaveforms(true)
+    setYourMixRegion(null)
+    setReferenceRegion(null)
+    setResults(null)
+    setError(null)
+  }
+
   return (
     <div className="app">
       <header className="app-header">
@@ -217,6 +226,7 @@ function App() {
               referenceName={results.reference.filename}
               yourMixRegion={yourMixRegion}
               referenceRegion={referenceRegion}
+              onSelectDifferentRegions={handleSelectDifferentRegions}
             />
 
             <SpectrumChart

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useImperativeHandle, forwardRef } from 're
 import { MultiBandEQProcessor } from '../services/MultiBandEQProcessor'
 import './AudioPlayer.css'
 
-const AudioPlayer = forwardRef(({ yourMixFile, referenceFile, yourMixName, referenceName, yourMixRegion, referenceRegion }, ref) => {
+const AudioPlayer = forwardRef(({ yourMixFile, referenceFile, yourMixName, referenceName, yourMixRegion, referenceRegion, onSelectDifferentRegions }, ref) => {
   const [playing, setPlaying] = useState(null) // 'your' or 'reference' or null
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
@@ -318,7 +318,36 @@ const AudioPlayer = forwardRef(({ yourMixFile, referenceFile, yourMixName, refer
           marginBottom: '16px',
           fontSize: '14px'
         }}>
-          <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>Analyzed Regions:</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+            <div style={{ fontWeight: 'bold' }}>Analyzed Regions:</div>
+            {onSelectDifferentRegions && (
+              <button
+                onClick={onSelectDifferentRegions}
+                style={{
+                  background: 'rgba(59, 130, 246, 0.2)',
+                  border: '1px solid rgba(59, 130, 246, 0.5)',
+                  borderRadius: '6px',
+                  padding: '4px 12px',
+                  fontSize: '12px',
+                  color: '#3b82f6',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  transition: 'all 0.2s ease',
+                  whiteSpace: 'nowrap'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = 'rgba(59, 130, 246, 0.3)'
+                  e.target.style.transform = 'scale(1.05)'
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = 'rgba(59, 130, 246, 0.2)'
+                  e.target.style.transform = 'scale(1)'
+                }}
+              >
+                Select Different Regions
+              </button>
+            )}
+          </div>
           {yourMixRegion && (
             <div style={{ marginBottom: '4px' }}>
               <span style={{ color: '#3b82f6' }}>▶ Your Mix:</span> {formatTimeSeconds(yourMixRegion.start)} - {formatTimeSeconds(yourMixRegion.end)} ({yourMixRegion.duration?.toFixed(1)}s)
@@ -357,20 +386,18 @@ const AudioPlayer = forwardRef(({ yourMixFile, referenceFile, yourMixName, refer
       </div>
 
       <div className="playback-info">
-        {playing === 'your' && <span className="now-playing">▶ {yourMixName}</span>}
-        {playing === 'reference' && <span className="now-playing">▶ {referenceName}</span>}
-        {!playing && (
-          <div className="playback-info-idle">
-            <span className="now-playing-idle">Ready to play</span>
-            <button
-              className={`loop-btn ${loopEnabled ? 'active' : ''}`}
-              onClick={() => setLoopEnabled(!loopEnabled)}
-              title={loopEnabled ? 'Loop enabled' : 'Loop disabled'}
-            >
-              🔁
-            </button>
-          </div>
-        )}
+        <div className="playback-info-idle">
+          {playing === 'your' && <span className="now-playing">▶ Your Mix</span>}
+          {playing === 'reference' && <span className="now-playing">▶ Reference</span>}
+          {!playing && <span className="now-playing-idle">Ready to play</span>}
+          <button
+            className={`loop-btn ${loopEnabled ? 'active' : ''}`}
+            onClick={() => setLoopEnabled(!loopEnabled)}
+            title={loopEnabled ? 'Loop enabled' : 'Loop disabled'}
+          >
+            🔁
+          </button>
+        </div>
       </div>
 
       <div className="timeline">
