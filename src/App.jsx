@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import FileUpload from './components/FileUpload'
 import WaveformSelector from './components/WaveformSelector'
 import AudioPlayer from './components/AudioPlayer'
@@ -17,6 +17,8 @@ function App() {
   const [results, setResults] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+
+  const audioPlayerRef = useRef(null)
 
   const handleContinueToWaveforms = () => {
     if (!yourMixFile || !referenceFile) {
@@ -208,6 +210,7 @@ function App() {
             </div>
 
             <AudioPlayer
+              ref={audioPlayerRef}
               yourMixFile={yourMixFile}
               referenceFile={referenceFile}
               yourMixName={results.your_mix.filename}
@@ -221,7 +224,7 @@ function App() {
               referenceData={results.reference.spectrum_data}
             />
 
-            <ResultsPanel results={results} />
+            <ResultsPanel results={results} audioPlayerRef={audioPlayerRef} />
           </div>
         )}
       </main>

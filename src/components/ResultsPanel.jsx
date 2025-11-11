@@ -1,7 +1,14 @@
+import { useState } from 'react'
 import './ResultsPanel.css'
 
-function ResultsPanel({ results }) {
+function ResultsPanel({ results, audioPlayerRef }) {
   const { your_mix, reference, comparison, suggestions } = results
+
+  // EQ state
+  const [masterEqEnabled, setMasterEqEnabled] = useState(false)
+  const [eqProcessing, setEqProcessing] = useState(false)
+  const [wetDry, setWetDry] = useState(100) // 0-100%
+  const [bandStates, setBandStates] = useState([]) // Array of enabled states for each band
 
   // Helper function to safely get nested values
   const safe = (value, defaultValue = 'N/A') => {
@@ -14,6 +21,75 @@ function ResultsPanel({ results }) {
       return Number(value).toFixed(decimals)
     }
     return defaultValue
+  }
+
+  // Handle Master EQ toggle
+  const handleMasterEQToggle = async () => {
+    if (eqProcessing || !audioPlayerRef?.current) return
+
+    setEqProcessing(true)
+
+    try {
+      const eqSuggestions = suggestions?.eq_adjustments
+      if (!eqSuggestions || eqSuggestions.length === 0) {
+        console.error('No EQ suggestions available')
+        setEqProcessing(false)
+        return
+      }
+
+      // Initialize all EQ bands if not already done
+      if (!masterEqEnabled) {
+        console.log('ResultsPanel: Initializing all EQ bands via AudioPlayer...')
+        await audioPlayerRef.current.initializeAllEQ(eqSuggestions)
+
+        // Initialize band states (all enabled by default)
+        setBandStates(eqSuggestions.map(() => true))
+      }
+
+      // Toggle master EQ
+      const newState = audioPlayerRef.current.toggleMasterEQ()
+      setMasterEqEnabled(newState)
+      console.log('ResultsPanel: Master EQ toggled to', newState ? 'ON' : 'OFF')
+    } catch (error) {
+      console.error('Error toggling master EQ:', error)
+      alert('Failed to toggle EQ: ' + error.message)
+    } finally {
+      setEqProcessing(false)
+    }
+  }
+
+  // Handle wet/dry slider change
+  const handleWetDryChange = (e) => {
+    const newWetDry = parseFloat(e.target.value)
+    setWetDry(newWetDry)
+
+    if (audioPlayerRef?.current && masterEqEnabled) {
+      try {
+        audioPlayerRef.current.setWetDry(newWetDry)
+        console.log('ResultsPanel: Wet/Dry set to', newWetDry, '%')
+      } catch (error) {
+        console.error('Error updating wet/dry:', error)
+      }
+    }
+  }
+
+  // Handle individual band toggle
+  const handleBandToggle = (bandIndex) => {
+    if (!audioPlayerRef?.current || !masterEqEnabled) return
+
+    try {
+      const newState = !bandStates[bandIndex]
+      audioPlayerRef.current.toggleBand(bandIndex, newState)
+
+      // Update band states
+      const newBandStates = [...bandStates]
+      newBandStates[bandIndex] = newState
+      setBandStates(newBandStates)
+
+      console.log('ResultsPanel: Band', bandIndex, 'toggled to', newState ? 'ON' : 'OFF')
+    } catch (error) {
+      console.error('Error toggling band:', error)
+    }
   }
 
   return (
@@ -189,19 +265,58 @@ function ResultsPanel({ results }) {
       {/* EQ Suggestions Section */}
       {suggestions.eq_adjustments && suggestions.eq_adjustments.length > 0 && (
         <section className="results-section eq-section">
-          <h3>EQ Suggestions</h3>
+          <div className="eq-section-header">
+            <h3>EQ Suggestions</h3>
+            {audioPlayerRef && (
+              <div className="eq-master-controls">
+                <button
+                  className={`eq-master-toggle ${masterEqEnabled ? 'active' : ''}`}
+                  onClick={handleMasterEQToggle}
+                  disabled={eqProcessing}
+                >
+                  {eqProcessing ? 'Loading...' : (masterEqEnabled ? 'Master EQ: ON' : 'Master EQ: OFF')}
+                </button>
+                <div className="eq-wetdry-control">
+                  <label className="eq-wetdry-label">
+                    Wet/Dry: {wetDry.toFixed(0)}%
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="1"
+                    value={wetDry}
+                    onChange={handleWetDryChange}
+                    disabled={!masterEqEnabled}
+                    className="eq-wetdry-slider"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
           <div className="eq-list">
             {suggestions.eq_adjustments.slice(0, 10).map((eq, index) => (
-              <div key={index} className="eq-item">
-                <div className="eq-header">
-                  <span className="eq-type">{eq.type.toUpperCase()}</span>
-                  <span className="eq-freq">{eq.frequency} Hz</span>
-                  <span className={`eq-gain ${eq.gain_db > 0 ? 'boost' : 'cut'}`}>
-                    {eq.gain_db > 0 ? '+' : ''}{safeFixed(eq.gain_db)} dB
-                  </span>
-                  <span className="eq-q">Q: {eq.q}</span>
+              <div key={index} className="eq-item eq-item-multiband">
+                <div className="eq-content">
+                  <div className="eq-header">
+                    <span className="eq-type">{eq.type.toUpperCase()}</span>
+                    <span className="eq-freq">{eq.frequency} Hz</span>
+                    <span className={`eq-gain ${eq.gain_db > 0 ? 'boost' : 'cut'}`}>
+                      {eq.gain_db > 0 ? '+' : ''}{safeFixed(eq.gain_db)} dB
+                    </span>
+                    <span className="eq-q">Q: {eq.q}</span>
+                  </div>
+                  <div className="eq-message">{eq.message}</div>
                 </div>
-                <div className="eq-message">{eq.message}</div>
+                {audioPlayerRef && (
+                  <button
+                    className={`eq-band-toggle ${bandStates[index] ? 'active' : ''}`}
+                    onClick={() => handleBandToggle(index)}
+                    disabled={!masterEqEnabled}
+                  >
+                    {bandStates[index] ? 'ON' : 'OFF'}
+                  </button>
+                )}
               </div>
             ))}
           </div>

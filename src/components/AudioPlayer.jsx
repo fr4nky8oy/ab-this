@@ -1,14 +1,16 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useImperativeHandle, forwardRef } from 'react'
+import { MultiBandEQProcessor } from '../services/MultiBandEQProcessor'
 import './AudioPlayer.css'
 
-function AudioPlayer({ yourMixFile, referenceFile, yourMixName, referenceName, yourMixRegion, referenceRegion }) {
+const AudioPlayer = forwardRef(({ yourMixFile, referenceFile, yourMixName, referenceName, yourMixRegion, referenceRegion }, ref) => {
   const [playing, setPlaying] = useState(null) // 'your' or 'reference' or null
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
 
   const yourAudioRef = useRef(null)
   const refAudioRef = useRef(null)
-  const audioContextRef = useRef(null)
+  const eqProcessorRef = useRef(null)
+  const eqConnectedRef = useRef(false)
 
   useEffect(() => {
     if (!yourMixFile || !referenceFile) return
@@ -218,6 +220,82 @@ function AudioPlayer({ yourMixFile, referenceFile, yourMixName, referenceName, y
     return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
+  // Expose EQ methods to parent via ref
+  useImperativeHandle(ref, () => ({
+    async initializeAllEQ(eqSuggestions) {
+      try {
+        if (!yourAudioRef.current) {
+          throw new Error('Audio element not ready')
+        }
+
+        // Initialize processor if not already done
+        if (!eqProcessorRef.current) {
+          console.log('AudioPlayer: Initializing MultiBand EQ processor...')
+          const processor = new MultiBandEQProcessor()
+          await processor.initialize()
+          eqProcessorRef.current = processor
+        }
+
+        // Connect to audio element if not already connected
+        if (!eqConnectedRef.current) {
+          console.log('AudioPlayer: Connecting EQ to Your Mix audio element...')
+          eqProcessorRef.current.connectAudioElement(yourAudioRef.current)
+          eqConnectedRef.current = true
+        }
+
+        // Initialize all bands
+        eqProcessorRef.current.initializeAllBands(eqSuggestions)
+        console.log(`AudioPlayer: Initialized ${eqSuggestions.length} EQ bands`)
+        return true
+      } catch (error) {
+        console.error('AudioPlayer: Failed to initialize EQ:', error)
+        throw error
+      }
+    },
+
+    toggleMasterEQ() {
+      if (!eqProcessorRef.current) {
+        throw new Error('EQ not initialized')
+      }
+      return eqProcessorRef.current.toggleMaster()
+    },
+
+    toggleBand(bandIndex, enabled) {
+      if (!eqProcessorRef.current) {
+        throw new Error('EQ not initialized')
+      }
+      return eqProcessorRef.current.toggleBand(bandIndex, enabled)
+    },
+
+    setWetDry(percentage) {
+      if (!eqProcessorRef.current) {
+        throw new Error('EQ not initialized')
+      }
+      return eqProcessorRef.current.setWetDry(percentage)
+    },
+
+    getMasterEnabled() {
+      return eqProcessorRef.current?.getMasterEnabled() || false
+    },
+
+    getWetDry() {
+      return eqProcessorRef.current?.getWetDry() || 100
+    },
+
+    getBandEnabled(bandIndex) {
+      return eqProcessorRef.current?.getBandEnabled(bandIndex) || false
+    }
+  }))
+
+  // Cleanup EQ processor on unmount
+  useEffect(() => {
+    return () => {
+      if (eqProcessorRef.current) {
+        eqProcessorRef.current.dispose()
+      }
+    }
+  }, [])
+
   return (
     <div className="audio-player">
       <h3>A/B Playback</h3>
@@ -287,6 +365,8 @@ function AudioPlayer({ yourMixFile, referenceFile, yourMixName, referenceName, y
       </div>
     </div>
   )
-}
+})
+
+AudioPlayer.displayName = 'AudioPlayer'
 
 export default AudioPlayer
