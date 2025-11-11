@@ -6,6 +6,7 @@ const AudioPlayer = forwardRef(({ yourMixFile, referenceFile, yourMixName, refer
   const [playing, setPlaying] = useState(null) // 'your' or 'reference' or null
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
+  const [loopEnabled, setLoopEnabled] = useState(false)
 
   const yourAudioRef = useRef(null)
   const refAudioRef = useRef(null)
@@ -47,10 +48,14 @@ const AudioPlayer = forwardRef(({ yourMixFile, referenceFile, yourMixName, refer
           const relativeTime = yourAudioRef.current.currentTime - yourMixRegion.start
           setCurrentTime(Math.max(0, relativeTime))
 
-          // Stop at region end
+          // Loop or stop at region end
           if (yourAudioRef.current.currentTime >= yourMixRegion.end) {
-            yourAudioRef.current.pause()
-            setPlaying(null)
+            if (loopEnabled) {
+              yourAudioRef.current.currentTime = yourMixRegion.start
+            } else {
+              yourAudioRef.current.pause()
+              setPlaying(null)
+            }
           }
         } else {
           setCurrentTime(yourAudioRef.current.currentTime)
@@ -87,10 +92,14 @@ const AudioPlayer = forwardRef(({ yourMixFile, referenceFile, yourMixName, refer
           const relativeTime = refAudioRef.current.currentTime - referenceRegion.start
           setCurrentTime(Math.max(0, relativeTime))
 
-          // Stop at region end
+          // Loop or stop at region end
           if (refAudioRef.current.currentTime >= referenceRegion.end) {
-            refAudioRef.current.pause()
-            setPlaying(null)
+            if (loopEnabled) {
+              refAudioRef.current.currentTime = referenceRegion.start
+            } else {
+              refAudioRef.current.pause()
+              setPlaying(null)
+            }
           }
         } else {
           setCurrentTime(refAudioRef.current.currentTime)
@@ -112,7 +121,7 @@ const AudioPlayer = forwardRef(({ yourMixFile, referenceFile, yourMixName, refer
         URL.revokeObjectURL(refAudioRef.current.src)
       }
     }
-  }, [yourMixFile, referenceFile, yourMixRegion, referenceRegion])
+  }, [yourMixFile, referenceFile, yourMixRegion, referenceRegion, loopEnabled])
 
   const playYourMix = () => {
     if (playing === 'your') {
@@ -350,7 +359,18 @@ const AudioPlayer = forwardRef(({ yourMixFile, referenceFile, yourMixName, refer
       <div className="playback-info">
         {playing === 'your' && <span className="now-playing">▶ {yourMixName}</span>}
         {playing === 'reference' && <span className="now-playing">▶ {referenceName}</span>}
-        {!playing && <span className="now-playing-idle">Ready to play</span>}
+        {!playing && (
+          <div className="playback-info-idle">
+            <span className="now-playing-idle">Ready to play</span>
+            <button
+              className={`loop-btn ${loopEnabled ? 'active' : ''}`}
+              onClick={() => setLoopEnabled(!loopEnabled)}
+              title={loopEnabled ? 'Loop enabled' : 'Loop disabled'}
+            >
+              🔁
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="timeline">

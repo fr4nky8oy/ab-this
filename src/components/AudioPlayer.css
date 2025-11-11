@@ -80,6 +80,15 @@
   text-align: center;
   margin-bottom: 16px;
   height: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.playback-info-idle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .now-playing {
@@ -89,6 +98,39 @@
 
 .now-playing-idle {
   color: #666;
+}
+
+.loop-btn {
+  background: transparent;
+  border: 2px solid #666;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 28px;
+}
+
+.loop-btn:hover {
+  border-color: #10b981;
+  color: #10b981;
+  transform: scale(1.05);
+}
+
+.loop-btn.active {
+  background: #10b981;
+  border-color: #10b981;
+  color: #fff;
+}
+
+.loop-btn.active:hover {
+  background: #059669;
+  border-color: #059669;
 }
 
 .timeline {
