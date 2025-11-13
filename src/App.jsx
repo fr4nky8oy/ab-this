@@ -234,7 +234,12 @@ function App() {
               referenceData={results.reference.spectrum_data}
             />
 
-            <ResultsPanel results={results} audioPlayerRef={audioPlayerRef} />
+            <ResultsPanel
+              results={results}
+              audioPlayerRef={audioPlayerRef}
+              yourMixFilename={yourMixFile?.name}
+              referenceFilename={referenceFile?.name}
+            />
           </div>
         )}
       </main>

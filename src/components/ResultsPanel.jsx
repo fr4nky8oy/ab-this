@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import './ResultsPanel.css'
+import { generatePDFReport } from '../utils/pdfGenerator'
 
-function ResultsPanel({ results, audioPlayerRef }) {
+function ResultsPanel({ results, audioPlayerRef, yourMixFilename, referenceFilename }) {
   const { your_mix, reference, comparison, suggestions } = results
 
   // EQ state
@@ -89,6 +90,16 @@ function ResultsPanel({ results, audioPlayerRef }) {
       console.log('ResultsPanel: Band', bandIndex, 'toggled to', newState ? 'ON' : 'OFF')
     } catch (error) {
       console.error('Error toggling band:', error)
+    }
+  }
+
+  // Handle PDF download
+  const handleDownloadPDF = () => {
+    try {
+      generatePDFReport(results, yourMixFilename || 'Your Mix', referenceFilename || 'Reference')
+    } catch (error) {
+      console.error('Error generating PDF:', error)
+      alert('Failed to generate PDF report: ' + error.message)
     }
   }
 
@@ -411,6 +422,16 @@ function ResultsPanel({ results, audioPlayerRef }) {
           )}
         </section>
       )}
+
+      {/* Download PDF Button */}
+      <section className="results-section download-section">
+        <button
+          className="download-pdf-button"
+          onClick={handleDownloadPDF}
+        >
+          📄 Download PDF Report
+        </button>
+      </section>
     </div>
   )
 }
