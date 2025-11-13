@@ -113,10 +113,20 @@ export function generatePDFReport(results, yourMixFilename, referenceFilename) {
   // ============ FREQUENCY BALANCE ============
   addSectionTitle('Frequency Balance')
 
+  // Frequency band ranges (standard mixing bands)
+  const frequencyRanges = {
+    'sub_bass': '20-60 Hz',
+    'bass': '60-250 Hz',
+    'low_mids': '250-500 Hz',
+    'mids': '500-2000 Hz',
+    'high_mids': '2000-6000 Hz',
+    'highs': '6000-20000 Hz'
+  }
+
   Object.entries(comparison.frequency_balance.differences).forEach(([band, data]) => {
     addSubsectionTitle(band.replace('_', ' ').toUpperCase())
     addKeyValue('Difference', `${data.difference_db > 0 ? '+' : ''}${data.difference_db.toFixed(1)} dB (${data.status})`, 5)
-    addKeyValue('Range', data.frequency_range, 5)
+    addKeyValue('Range', frequencyRanges[band] || 'N/A', 5)
     yPos += 2
   })
   yPos += 3
