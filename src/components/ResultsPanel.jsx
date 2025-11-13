@@ -287,6 +287,31 @@ function ResultsPanel({ results, audioPlayerRef }) {
             </div>
           </div>
         </div>
+
+        {/* Dynamic Suggestions */}
+        {(suggestions.compression || suggestions.gain || suggestions.limiting) && (
+          <div className="dynamics-suggestions">
+            <h4>Suggestions</h4>
+            {suggestions.compression && (
+              <div className="suggestion-box">
+                <div className="suggestion-label">Compression</div>
+                <div className="suggestion-message">{suggestions.compression.message}</div>
+              </div>
+            )}
+            {suggestions.gain && (
+              <div className="suggestion-box">
+                <div className="suggestion-label">Gain Adjustment</div>
+                <div className="suggestion-message">{suggestions.gain.message}</div>
+              </div>
+            )}
+            {suggestions.limiting && (
+              <div className="suggestion-box">
+                <div className="suggestion-label">Limiting</div>
+                <div className="suggestion-message">{suggestions.limiting.message}</div>
+              </div>
+            )}
+          </div>
+        )}
       </section>
 
       {/* Stereo Width Section */}
