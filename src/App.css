@@ -26,6 +26,29 @@ body {
   padding: 40px 20px 20px;
   background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%);
   border-bottom: 1px solid #222;
+  position: relative;
+}
+
+.support-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  border: none;
+  border-radius: 20px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.support-button:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
 }
 
 .header-title {
@@ -371,6 +394,13 @@ body {
 
 /* Responsive */
 @media (max-width: 768px) {
+  .support-button {
+    top: 12px;
+    right: 12px;
+    padding: 8px 16px;
+    font-size: 12px;
+  }
+
   .app-header h1 {
     font-size: 36px;
   }
@@ -436,6 +466,13 @@ body {
 }
 
 @media (max-width: 480px) {
+  .support-button {
+    top: 8px;
+    right: 8px;
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+
   .app-header {
     padding: 24px 16px 16px;
   }

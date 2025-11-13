@@ -4,6 +4,7 @@ import WaveformSelector from './components/WaveformSelector'
 import AudioPlayer from './components/AudioPlayer'
 import SpectrumChart from './components/SpectrumChart'
 import ResultsPanel from './components/ResultsPanel'
+import PaymentModal from './components/PaymentModal'
 import './App.css'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
@@ -17,6 +18,7 @@ function App() {
   const [results, setResults] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [showPaymentModal, setShowPaymentModal] = useState(false)
 
   const audioPlayerRef = useRef(null)
 
@@ -112,6 +114,12 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
+        <button
+          onClick={() => setShowPaymentModal(true)}
+          className="support-button"
+        >
+          Support This Project
+        </button>
         <div className="header-title">
           <div className="waveform-animation waveform-left">
             <div className="wave-bar"></div>
@@ -301,6 +309,10 @@ function App() {
           </div>
         </div>
       </footer>
+
+      {showPaymentModal && (
+        <PaymentModal onClose={() => setShowPaymentModal(false)} />
+      )}
     </div>
   )
 }
