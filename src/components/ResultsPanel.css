@@ -94,6 +94,75 @@
   color: #ccc;
 }
 
+/* Clarity Score Guide */
+.clarity-guide {
+  background: #222;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
+  border-left: 4px solid #3b82f6;
+}
+
+.clarity-guide h4 {
+  margin: 0 0 16px 0;
+  color: #fff;
+  font-size: 16px;
+}
+
+.clarity-ranges {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #333;
+}
+
+.clarity-range {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 8px;
+  background: #1a1a1a;
+  border-radius: 6px;
+}
+
+.range-score {
+  font-weight: 700;
+  font-size: 14px;
+  min-width: 60px;
+  text-align: center;
+}
+
+.range-description {
+  color: #ccc;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.clarity-assessment {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.clarity-rating {
+  padding: 10px;
+  background: #1a1a1a;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #fff;
+}
+
+.clarity-rating strong {
+  color: #fff;
+}
+
+.clarity-rating-detail {
+  color: #ccc;
+  margin-left: 4px;
+}
+
 /* Frequency Balance */
 .frequency-bands {
   display: grid;

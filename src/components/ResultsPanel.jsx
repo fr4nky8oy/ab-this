@@ -93,6 +93,19 @@ function ResultsPanel({ results, audioPlayerRef, yourMixFilename, referenceFilen
     }
   }
 
+  // Helper function to get clarity interpretation
+  const getClarityInterpretation = (score) => {
+    if (score >= 70) {
+      return { rating: 'Excellent', description: 'Excellent frequency separation - each instrument has its own space', color: '#10b981' }
+    } else if (score >= 50) {
+      return { rating: 'Good', description: 'Good separation - clear mix with minor overlaps', color: '#3b82f6' }
+    } else if (score >= 33) {
+      return { rating: 'Moderate', description: 'Moderate clarity - some frequency masking present', color: '#f59e0b' }
+    } else {
+      return { rating: 'Poor', description: 'Poor separation - muddy mix with lots of frequency overlap', color: '#ef4444' }
+    }
+  }
+
   // Handle PDF download
   const handleDownloadPDF = () => {
     try {
@@ -144,6 +157,51 @@ function ResultsPanel({ results, audioPlayerRef, yourMixFilename, referenceFilen
             </div>
           </div>
         </div>
+
+        {/* Clarity Score Interpretation Guide */}
+        {(your_mix?.masking?.clarity_score !== undefined || reference?.masking?.clarity_score !== undefined) && (
+          <div className="clarity-guide">
+            <h4>Clarity Score Guide</h4>
+            <div className="clarity-ranges">
+              <div className="clarity-range">
+                <span className="range-score" style={{ color: '#10b981' }}>70-100</span>
+                <span className="range-description">Excellent frequency separation - each instrument has its own space</span>
+              </div>
+              <div className="clarity-range">
+                <span className="range-score" style={{ color: '#3b82f6' }}>50-69</span>
+                <span className="range-description">Good separation - clear mix with minor overlaps</span>
+              </div>
+              <div className="clarity-range">
+                <span className="range-score" style={{ color: '#f59e0b' }}>33-49</span>
+                <span className="range-description">Moderate clarity - some frequency masking present</span>
+              </div>
+              <div className="clarity-range">
+                <span className="range-score" style={{ color: '#ef4444' }}>0-32</span>
+                <span className="range-description">Poor separation - muddy mix with lots of frequency overlap</span>
+              </div>
+            </div>
+            <div className="clarity-assessment">
+              {your_mix?.masking?.clarity_score !== undefined && (
+                <div className="clarity-rating">
+                  <strong>Your Mix: </strong>
+                  <span style={{ color: getClarityInterpretation(your_mix.masking.clarity_score).color }}>
+                    {getClarityInterpretation(your_mix.masking.clarity_score).rating}
+                  </span>
+                  <span className="clarity-rating-detail"> - {getClarityInterpretation(your_mix.masking.clarity_score).description}</span>
+                </div>
+              )}
+              {reference?.masking?.clarity_score !== undefined && (
+                <div className="clarity-rating">
+                  <strong>Reference: </strong>
+                  <span style={{ color: getClarityInterpretation(reference.masking.clarity_score).color }}>
+                    {getClarityInterpretation(reference.masking.clarity_score).rating}
+                  </span>
+                  <span className="clarity-rating-detail"> - {getClarityInterpretation(reference.masking.clarity_score).description}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {suggestions?.summary && suggestions.summary.length > 0 && (
           <div className="key-findings">
