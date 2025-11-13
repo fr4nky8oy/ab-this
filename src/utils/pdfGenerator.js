@@ -177,15 +177,27 @@ export function generatePDFReport(results, yourMixFilename, referenceFilename) {
 
     if (suggestions.crest_factor) {
       addText(`Crest Factor: ${suggestions.crest_factor.message}`, 5)
+      if (suggestions.crest_factor.recommended_plugins) {
+        addText(`   Recommended plugins: ${suggestions.crest_factor.recommended_plugins}`, 5)
+      }
     }
     if (suggestions.compression) {
       addText(`Compression: ${suggestions.compression.message}`, 5)
+      if (suggestions.compression.recommended_plugins) {
+        addText(`   Recommended plugins: ${suggestions.compression.recommended_plugins}`, 5)
+      }
     }
     if (suggestions.gain) {
       addText(`Gain: ${suggestions.gain.message}`, 5)
+      if (suggestions.gain.recommended_plugins) {
+        addText(`   Recommended plugins: ${suggestions.gain.recommended_plugins}`, 5)
+      }
     }
     if (suggestions.limiting) {
       addText(`Limiting: ${suggestions.limiting.message}`, 5)
+      if (suggestions.limiting.recommended_plugins) {
+        addText(`   Recommended plugins: ${suggestions.limiting.recommended_plugins}`, 5)
+      }
     }
     yPos += 5
   }
@@ -217,16 +229,25 @@ export function generatePDFReport(results, yourMixFilename, referenceFilename) {
 
     if (suggestions.stereo.overall) {
       addText(suggestions.stereo.overall.message, 5)
+      if (suggestions.stereo.overall.recommended_plugins) {
+        addText(`   Recommended plugins: ${suggestions.stereo.overall.recommended_plugins}`, 5)
+      }
     }
 
     if (suggestions.stereo.per_band && suggestions.stereo.per_band.length > 0) {
       suggestions.stereo.per_band.forEach((item) => {
         addText(`${item.band.replace('_', ' ')}: ${item.message}`, 5)
+        if (item.recommended_plugins) {
+          addText(`   Recommended plugins: ${item.recommended_plugins}`, 5)
+        }
       })
     }
 
     if (suggestions.stereo.phase) {
       addText(`⚠ ${suggestions.stereo.phase.message}`, 5)
+      if (suggestions.stereo.phase.recommended_plugins) {
+        addText(`   Recommended plugins: ${suggestions.stereo.phase.recommended_plugins}`, 5)
+      }
     }
     yPos += 5
   }
