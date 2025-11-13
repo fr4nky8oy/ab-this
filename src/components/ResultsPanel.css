@@ -695,3 +695,18 @@
   transform: translateY(0);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
+
+/* Plugin Recommendations */
+.suggestion-plugins {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 13px;
+  color: #a0a0a0;
+  line-height: 1.6;
+}
+
+.suggestion-plugins strong {
+  color: #b8b8b8;
+  font-weight: 600;
+}

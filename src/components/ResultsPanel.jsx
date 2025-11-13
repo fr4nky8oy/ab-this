@@ -308,24 +308,44 @@ function ResultsPanel({ results, audioPlayerRef, yourMixFilename, referenceFilen
                 <div className="suggestion-box">
                   <div className="suggestion-label">Crest Factor / Dynamic Range</div>
                   <div className="suggestion-message">{suggestions.crest_factor.message}</div>
+                  {suggestions.crest_factor.recommended_plugins && (
+                    <div className="suggestion-plugins">
+                      <strong>Recommended plugins:</strong> {suggestions.crest_factor.recommended_plugins}
+                    </div>
+                  )}
                 </div>
               )}
               {suggestions.compression && (
                 <div className="suggestion-box">
                   <div className="suggestion-label">Compression</div>
                   <div className="suggestion-message">{suggestions.compression.message}</div>
+                  {suggestions.compression.recommended_plugins && (
+                    <div className="suggestion-plugins">
+                      <strong>Recommended plugins:</strong> {suggestions.compression.recommended_plugins}
+                    </div>
+                  )}
                 </div>
               )}
               {suggestions.gain && (
                 <div className="suggestion-box">
                   <div className="suggestion-label">Gain Adjustment</div>
                   <div className="suggestion-message">{suggestions.gain.message}</div>
+                  {suggestions.gain.recommended_plugins && (
+                    <div className="suggestion-plugins">
+                      <strong>Recommended plugins:</strong> {suggestions.gain.recommended_plugins}
+                    </div>
+                  )}
                 </div>
               )}
               {suggestions.limiting && (
                 <div className="suggestion-box">
                   <div className="suggestion-label">Limiting</div>
                   <div className="suggestion-message">{suggestions.limiting.message}</div>
+                  {suggestions.limiting.recommended_plugins && (
+                    <div className="suggestion-plugins">
+                      <strong>Recommended plugins:</strong> {suggestions.limiting.recommended_plugins}
+                    </div>
+                  )}
                 </div>
               )}
             </>
@@ -403,6 +423,11 @@ function ResultsPanel({ results, audioPlayerRef, yourMixFilename, referenceFilen
           {suggestions.stereo.overall && (
             <div className="suggestion-box">
               <div className="suggestion-message">{suggestions.stereo.overall.message}</div>
+              {suggestions.stereo.overall.recommended_plugins && (
+                <div className="suggestion-plugins">
+                  <strong>Recommended plugins:</strong> {suggestions.stereo.overall.recommended_plugins}
+                </div>
+              )}
             </div>
           )}
           {suggestions.stereo.per_band && suggestions.stereo.per_band.length > 0 && (
@@ -411,6 +436,11 @@ function ResultsPanel({ results, audioPlayerRef, yourMixFilename, referenceFilen
                 <div key={index} className="suggestion-box">
                   <div className="suggestion-label">{item.band.replace('_', ' ')}</div>
                   <div className="suggestion-message">{item.message}</div>
+                  {item.recommended_plugins && (
+                    <div className="suggestion-plugins">
+                      <strong>Recommended plugins:</strong> {item.recommended_plugins}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -418,6 +448,11 @@ function ResultsPanel({ results, audioPlayerRef, yourMixFilename, referenceFilen
           {suggestions.stereo.phase && (
             <div className="suggestion-box warning">
               <div className="suggestion-message">{suggestions.stereo.phase.message}</div>
+              {suggestions.stereo.phase.recommended_plugins && (
+                <div className="suggestion-plugins">
+                  <strong>Recommended plugins:</strong> {suggestions.stereo.phase.recommended_plugins}
+                </div>
+              )}
             </div>
           )}
         </section>
