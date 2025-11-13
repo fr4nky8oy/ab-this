@@ -703,15 +703,48 @@
   border-left: 4px solid #f59e0b;
 }
 
+.masking-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .masking-bands {
   font-weight: 600;
   color: #fff;
-  margin-bottom: 8px;
+  font-size: 15px;
+}
+
+.masking-frequency {
+  font-size: 13px;
+  color: #888;
+  font-family: monospace;
 }
 
 .masking-message {
   color: #ccc;
   font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.masking-technique {
+  background: #1a1a1a;
+  padding: 12px;
+  border-radius: 6px;
+  margin-top: 12px;
+  font-size: 13px;
+  color: #ccc;
+  line-height: 1.6;
+  border-left: 3px solid #3b82f6;
+}
+
+.masking-technique strong {
+  color: #3b82f6;
+  font-weight: 600;
 }
 
 /* Responsive */

@@ -256,7 +256,15 @@ export function generatePDFReport(results, yourMixFilename, referenceFilename) {
   if (suggestions.masking && suggestions.masking.length > 0) {
     addSectionTitle('Masking Issues')
     suggestions.masking.forEach((item) => {
-      addText(`${item.bands.join(' / ')}: ${item.message}`, 5)
+      addText(`${item.bands.join(' / ')} (${item.frequency})`, 5)
+      addText(`${item.message}`, 5)
+      if (item.technique) {
+        addText(`   Technique: ${item.technique}`, 5)
+      }
+      if (item.recommended_plugins) {
+        addText(`   Recommended plugins: ${item.recommended_plugins}`, 5)
+      }
+      yPos += 3
     })
     yPos += 5
   }

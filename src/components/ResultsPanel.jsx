@@ -466,8 +466,21 @@ function ResultsPanel({ results, audioPlayerRef, yourMixFilename, referenceFilen
           <div className="masking-list">
             {suggestions.masking.map((item, index) => (
               <div key={index} className="masking-item">
-                <div className="masking-bands">{item.bands.join(' / ')}</div>
+                <div className="masking-header">
+                  <div className="masking-bands">{item.bands.join(' / ')}</div>
+                  <div className="masking-frequency">{item.frequency}</div>
+                </div>
                 <div className="masking-message">{item.message}</div>
+                {item.technique && (
+                  <div className="masking-technique">
+                    <strong>Technique:</strong> {item.technique}
+                  </div>
+                )}
+                {item.recommended_plugins && (
+                  <div className="suggestion-plugins">
+                    <strong>Recommended plugins:</strong> {item.recommended_plugins}
+                  </div>
+                )}
               </div>
             ))}
           </div>
