@@ -61,6 +61,7 @@
 .upload-icon {
   font-size: 48px;
   margin-bottom: 16px;
+  filter: grayscale(0%) brightness(1.2) sepia(100%) saturate(200%) hue-rotate(25deg);
 }
 
 .drop-prompt p {

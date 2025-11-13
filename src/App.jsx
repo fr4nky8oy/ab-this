@@ -112,7 +112,23 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>A/B This</h1>
+        <div className="header-title">
+          <div className="waveform-animation waveform-left">
+            <div className="wave-bar"></div>
+            <div className="wave-bar"></div>
+            <div className="wave-bar"></div>
+            <div className="wave-bar"></div>
+            <div className="wave-bar"></div>
+          </div>
+          <h1>A/B This</h1>
+          <div className="waveform-animation waveform-right">
+            <div className="wave-bar"></div>
+            <div className="wave-bar"></div>
+            <div className="wave-bar"></div>
+            <div className="wave-bar"></div>
+            <div className="wave-bar"></div>
+          </div>
+        </div>
         <p className="subtitle">Compare. Analyze. Mix better.</p>
       </header>
 
