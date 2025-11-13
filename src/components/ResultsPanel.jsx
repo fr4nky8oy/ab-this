@@ -280,7 +280,7 @@ function ResultsPanel({ results, audioPlayerRef }) {
 
           <div className="dynamics-comparison">
             <h4>Loudness</h4>
-            <div className="comparison-text">{comparison.dynamics.loudness_comparison.description}</div>
+            <div className="comparison-text">{safe(comparison?.dynamics?.loudness_comparison?.description)}</div>
             <div className="metric-row">
               <span>LUFS Difference:</span>
               <span>{comparison?.dynamics?.loudness_comparison?.lufs_difference > 0 ? '+' : ''}{safeFixed(comparison?.dynamics?.loudness_comparison?.lufs_difference)} LUFS</span>
@@ -289,29 +289,35 @@ function ResultsPanel({ results, audioPlayerRef }) {
         </div>
 
         {/* Dynamic Suggestions */}
-        {(suggestions.compression || suggestions.gain || suggestions.limiting) && (
-          <div className="dynamics-suggestions">
-            <h4>Suggestions</h4>
-            {suggestions.compression && (
-              <div className="suggestion-box">
-                <div className="suggestion-label">Compression</div>
-                <div className="suggestion-message">{suggestions.compression.message}</div>
-              </div>
-            )}
-            {suggestions.gain && (
-              <div className="suggestion-box">
-                <div className="suggestion-label">Gain Adjustment</div>
-                <div className="suggestion-message">{suggestions.gain.message}</div>
-              </div>
-            )}
-            {suggestions.limiting && (
-              <div className="suggestion-box">
-                <div className="suggestion-label">Limiting</div>
-                <div className="suggestion-message">{suggestions.limiting.message}</div>
-              </div>
-            )}
-          </div>
-        )}
+        <div className="dynamics-suggestions">
+          <h4>Suggestions</h4>
+          {(suggestions.compression || suggestions.gain || suggestions.limiting) ? (
+            <>
+              {suggestions.compression && (
+                <div className="suggestion-box">
+                  <div className="suggestion-label">Compression</div>
+                  <div className="suggestion-message">{suggestions.compression.message}</div>
+                </div>
+              )}
+              {suggestions.gain && (
+                <div className="suggestion-box">
+                  <div className="suggestion-label">Gain Adjustment</div>
+                  <div className="suggestion-message">{suggestions.gain.message}</div>
+                </div>
+              )}
+              {suggestions.limiting && (
+                <div className="suggestion-box">
+                  <div className="suggestion-label">Limiting</div>
+                  <div className="suggestion-message">{suggestions.limiting.message}</div>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="suggestion-box success">
+              <div className="suggestion-message">✓ Your dynamics are well-matched to the reference. No adjustments needed.</div>
+            </div>
+          )}
+        </div>
       </section>
 
       {/* Stereo Width Section */}
