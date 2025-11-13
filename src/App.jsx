@@ -261,7 +261,26 @@ function App() {
       </main>
 
       <footer className="app-footer">
-        <p>Processing time: {results ? `${results.processing_time}s` : '—'}</p>
+        <div className="footer-content">
+          <div className="footer-left">
+            <p className="footer-privacy-title">🔒 Privacy First</p>
+            <p className="footer-privacy-text">Your files are processed in memory and immediately deleted after analysis.</p>
+            <p className="footer-privacy-text">No data is stored or logged. 100% secure and private.</p>
+          </div>
+          <div className="footer-center">
+            <p className="footer-credit">Made by Franky Redente via Claude Code</p>
+            {results && <p className="footer-processing-time">Processing time: {results.processing_time}s</p>}
+          </div>
+          <div className="footer-right">
+            <div className="footer-links">
+              <a href="https://frankyredente.com" target="_blank" rel="noopener noreferrer">Franky Redente</a>
+              <span className="footer-divider">|</span>
+              <a href="https://github.com/fr4nky8oy" target="_blank" rel="noopener noreferrer">GitHub</a>
+              <span className="footer-divider">|</span>
+              <a href="https://frankyredente.com" target="_blank" rel="noopener noreferrer">Contact</a>
+            </div>
+          </div>
+        </div>
       </footer>
     </div>
   )
