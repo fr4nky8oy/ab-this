@@ -137,6 +137,25 @@ function App() {
           !showWaveforms ? (
             // Phase 1: File Upload
             <div className="upload-section">
+              {/* Feature Cards */}
+              <div className="feature-cards">
+                <div className="feature-card">
+                  <div className="feature-icon">🎚️</div>
+                  <h4 className="feature-title">Detailed Analysis</h4>
+                  <p className="feature-description">Frequency, dynamics, stereo width</p>
+                </div>
+                <div className="feature-card">
+                  <div className="feature-icon">🎯</div>
+                  <h4 className="feature-title">Actionable Suggestions</h4>
+                  <p className="feature-description">Specific EQ, compression, stereo fixes</p>
+                </div>
+                <div className="feature-card">
+                  <div className="feature-icon">📄</div>
+                  <h4 className="feature-title">PDF Export</h4>
+                  <p className="feature-description">Download comprehensive report</p>
+                </div>
+              </div>
+
               <div className="upload-grid">
                 <FileUpload
                   label="Your Mix"
