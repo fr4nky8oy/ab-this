@@ -113,7 +113,7 @@ function App() {
     <div className="app">
       <header className="app-header">
         <h1>A/B This</h1>
-        <p className="subtitle">Compare your mix to reference tracks with professional analysis</p>
+        <p className="subtitle">Compare. Analyze. Mix better.</p>
       </header>
 
       <main className="app-main">
