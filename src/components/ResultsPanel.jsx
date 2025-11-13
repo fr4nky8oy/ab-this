@@ -200,6 +200,67 @@ function ResultsPanel({ results, audioPlayerRef }) {
         </section>
       )}
 
+      {/* EQ Suggestions Section */}
+      {suggestions.eq_adjustments && suggestions.eq_adjustments.length > 0 && (
+        <section className="results-section eq-section">
+          <div className="eq-section-header">
+            <h3>EQ Suggestions</h3>
+            {audioPlayerRef && (
+              <div className="eq-master-controls">
+                <button
+                  className={`eq-master-toggle ${masterEqEnabled ? 'active' : ''}`}
+                  onClick={handleMasterEQToggle}
+                  disabled={eqProcessing}
+                >
+                  {eqProcessing ? 'Loading...' : (masterEqEnabled ? 'Master EQ: ON' : 'Master EQ: OFF')}
+                </button>
+                <div className="eq-wetdry-control">
+                  <label className="eq-wetdry-label">
+                    Wet/Dry: {wetDry.toFixed(0)}%
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="1"
+                    value={wetDry}
+                    onChange={handleWetDryChange}
+                    disabled={!masterEqEnabled}
+                    className="eq-wetdry-slider"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="eq-list">
+            {suggestions.eq_adjustments.slice(0, 10).map((eq, index) => (
+              <div key={index} className="eq-item eq-item-multiband">
+                <div className="eq-content">
+                  <div className="eq-header">
+                    <span className="eq-type">{eq.type.toUpperCase()}</span>
+                    <span className="eq-freq">{eq.frequency} Hz</span>
+                    <span className={`eq-gain ${eq.gain_db > 0 ? 'boost' : 'cut'}`}>
+                      {eq.gain_db > 0 ? '+' : ''}{safeFixed(eq.gain_db)} dB
+                    </span>
+                    <span className="eq-q">Q: {eq.q}</span>
+                  </div>
+                  <div className="eq-message">{eq.message}</div>
+                </div>
+                {audioPlayerRef && (
+                  <button
+                    className={`eq-band-toggle ${bandStates[index] ? 'active' : ''}`}
+                    onClick={() => handleBandToggle(index)}
+                    disabled={!masterEqEnabled}
+                  >
+                    {bandStates[index] ? 'ON' : 'OFF'}
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Dynamics Section */}
       <section className="results-section">
         <h3>Dynamics</h3>
@@ -259,67 +320,6 @@ function ResultsPanel({ results, audioPlayerRef }) {
               )}
             </>
           )}
-        </section>
-      )}
-
-      {/* EQ Suggestions Section */}
-      {suggestions.eq_adjustments && suggestions.eq_adjustments.length > 0 && (
-        <section className="results-section eq-section">
-          <div className="eq-section-header">
-            <h3>EQ Suggestions</h3>
-            {audioPlayerRef && (
-              <div className="eq-master-controls">
-                <button
-                  className={`eq-master-toggle ${masterEqEnabled ? 'active' : ''}`}
-                  onClick={handleMasterEQToggle}
-                  disabled={eqProcessing}
-                >
-                  {eqProcessing ? 'Loading...' : (masterEqEnabled ? 'Master EQ: ON' : 'Master EQ: OFF')}
-                </button>
-                <div className="eq-wetdry-control">
-                  <label className="eq-wetdry-label">
-                    Wet/Dry: {wetDry.toFixed(0)}%
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    step="1"
-                    value={wetDry}
-                    onChange={handleWetDryChange}
-                    disabled={!masterEqEnabled}
-                    className="eq-wetdry-slider"
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-          <div className="eq-list">
-            {suggestions.eq_adjustments.slice(0, 10).map((eq, index) => (
-              <div key={index} className="eq-item eq-item-multiband">
-                <div className="eq-content">
-                  <div className="eq-header">
-                    <span className="eq-type">{eq.type.toUpperCase()}</span>
-                    <span className="eq-freq">{eq.frequency} Hz</span>
-                    <span className={`eq-gain ${eq.gain_db > 0 ? 'boost' : 'cut'}`}>
-                      {eq.gain_db > 0 ? '+' : ''}{safeFixed(eq.gain_db)} dB
-                    </span>
-                    <span className="eq-q">Q: {eq.q}</span>
-                  </div>
-                  <div className="eq-message">{eq.message}</div>
-                </div>
-                {audioPlayerRef && (
-                  <button
-                    className={`eq-band-toggle ${bandStates[index] ? 'active' : ''}`}
-                    onClick={() => handleBandToggle(index)}
-                    disabled={!masterEqEnabled}
-                  >
-                    {bandStates[index] ? 'ON' : 'OFF'}
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
         </section>
       )}
 
