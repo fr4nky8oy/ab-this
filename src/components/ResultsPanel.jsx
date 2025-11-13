@@ -215,6 +215,34 @@ function ResultsPanel({ results, audioPlayerRef, yourMixFilename, referenceFilen
         )}
       </section>
 
+      {/* Masking Issues */}
+      {suggestions.masking && suggestions.masking.length > 0 && (
+        <section className="results-section">
+          <h3>Masking Issues</h3>
+          <div className="masking-list">
+            {suggestions.masking.map((item, index) => (
+              <div key={index} className="masking-item">
+                <div className="masking-header">
+                  <div className="masking-bands">{item.bands.join(' / ')}</div>
+                  <div className="masking-frequency">{item.frequency}</div>
+                </div>
+                <div className="masking-message">{item.message}</div>
+                {item.technique && (
+                  <div className="masking-technique">
+                    <strong>Technique:</strong> {item.technique}
+                  </div>
+                )}
+                {item.recommended_plugins && (
+                  <div className="suggestion-plugins">
+                    <strong>Recommended plugins:</strong> {item.recommended_plugins}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Frequency Balance Section */}
       <section className="results-section">
         <h3>Frequency Balance</h3>
@@ -455,34 +483,6 @@ function ResultsPanel({ results, audioPlayerRef, yourMixFilename, referenceFilen
           <h3>Compression Suggestions</h3>
           <div className="suggestion-box">
             <div className="suggestion-message">{suggestions.compression.message}</div>
-          </div>
-        </section>
-      )}
-
-      {/* Masking Suggestions */}
-      {suggestions.masking && suggestions.masking.length > 0 && (
-        <section className="results-section">
-          <h3>Masking Issues</h3>
-          <div className="masking-list">
-            {suggestions.masking.map((item, index) => (
-              <div key={index} className="masking-item">
-                <div className="masking-header">
-                  <div className="masking-bands">{item.bands.join(' / ')}</div>
-                  <div className="masking-frequency">{item.frequency}</div>
-                </div>
-                <div className="masking-message">{item.message}</div>
-                {item.technique && (
-                  <div className="masking-technique">
-                    <strong>Technique:</strong> {item.technique}
-                  </div>
-                )}
-                {item.recommended_plugins && (
-                  <div className="suggestion-plugins">
-                    <strong>Recommended plugins:</strong> {item.recommended_plugins}
-                  </div>
-                )}
-              </div>
-            ))}
           </div>
         </section>
       )}
