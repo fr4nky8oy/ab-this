@@ -15,8 +15,8 @@ function SpectrumChart({ yourMixData, referenceData }) {
       return (
         <div className="custom-tooltip">
           <p className="tooltip-freq">{`${Math.round(payload[0].payload.frequency)} Hz`}</p>
-          <p className="tooltip-your">{`Your Mix: ${payload[0].value.toFixed(1)} dB`}</p>
-          <p className="tooltip-ref">{`Reference: ${payload[1].value.toFixed(1)} dB`}</p>
+          <p className="tooltip-your">{`Your Mix: ${payload[1].value.toFixed(1)} dB`}</p>
+          <p className="tooltip-ref">{`Reference: ${payload[0].value.toFixed(1)} dB`}</p>
         </div>
       )
     }
@@ -53,19 +53,19 @@ function SpectrumChart({ yourMixData, referenceData }) {
           <Legend />
           <Line
             type="monotone"
-            dataKey="yourMix"
-            stroke="#3b82f6"
-            strokeWidth={2}
-            dot={false}
-            name="Your Mix"
-          />
-          <Line
-            type="monotone"
             dataKey="reference"
             stroke="#10b981"
             strokeWidth={2}
             dot={false}
             name="Reference"
+          />
+          <Line
+            type="monotone"
+            dataKey="yourMix"
+            stroke="#3b82f6"
+            strokeWidth={2}
+            dot={false}
+            name="Your Mix"
           />
         </LineChart>
       </ResponsiveContainer>
