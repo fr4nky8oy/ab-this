@@ -291,8 +291,14 @@ function ResultsPanel({ results, audioPlayerRef }) {
         {/* Dynamic Suggestions */}
         <div className="dynamics-suggestions">
           <h4>Suggestions</h4>
-          {(suggestions.compression || suggestions.gain || suggestions.limiting) ? (
+          {(suggestions.crest_factor || suggestions.compression || suggestions.gain || suggestions.limiting) ? (
             <>
+              {suggestions.crest_factor && (
+                <div className="suggestion-box">
+                  <div className="suggestion-label">Crest Factor / Dynamic Range</div>
+                  <div className="suggestion-message">{suggestions.crest_factor.message}</div>
+                </div>
+              )}
               {suggestions.compression && (
                 <div className="suggestion-box">
                   <div className="suggestion-label">Compression</div>
